@@ -14,3 +14,9 @@ $ npx create-react-app client --template typescript
 ```
 $ npm install http-proxy-middleware
 ```
+
+## Sass 설치(client
+```
+$ npm install node-sass@4.14.0
+```
+> CRA에서는 하위 버전으로 설치
