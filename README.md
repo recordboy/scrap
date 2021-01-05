@@ -19,4 +19,4 @@ $ npm install http-proxy-middleware
 ```
 $ npm install node-sass@4.14.0
 ```
-> CRA에서는 하위 버전으로 설치
+> CRA에서는 4.14.0(하위) 버전으로 설치
