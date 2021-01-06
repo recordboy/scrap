@@ -12,7 +12,8 @@ const path = require("path");
 
 // 검색 요청 api
 app.use("/api/data", async function (req, res) {
-  res.json(await search());
+  console.log("검색 문구: ", req.query.searchText);
+  res.json(await getSearchData(req.query.searchText));
 });
 
 // 기본 포트를 app 객체에 설정
@@ -33,69 +34,57 @@ console.log(`server running at http ${port}`);
 // Crawling Start
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+const crawlingTag = {
+  google: "#rso > div"
+};
+
 /**
- * @return {Array} 검색 결과 값
+ * @param {String} searchText 검색 문구
+ * @return {Array} 검색 데이터
  */
-const search = async () => {
-  
-  // 브라우저를 실행한다.
-  // 옵션으로 headless모드를 끌 수 있다.
+const getSearchData = async (searchText) => {
+
+  // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
     headless: true,
   });
 
-  // 새로운 페이지를 연다.
+  // 브라우저 오픈
   const page = await browser.newPage();
 
-  // 페이지의 크기를 설정한다.
+  // 페이지 크기 설정
   // await page.setViewport({
   //   width: 1366,
   //   height: 768,
   // });
 
+  
+
   await page.goto("https://www.google.com/"); // 구글 검색창 이동
-  await page.type('input[class="gLFyf gsfi"]', "퍼펫티어");
-  await page.type('input[class="gLFyf gsfi"]', String.fromCharCode(13)); // 엔터키를 입력하여 검색 수행
+  await page.type('input[class="gLFyf gsfi"]', searchText); // 검색 키워드
+  await page.type('input[class="gLFyf gsfi"]', String.fromCharCode(13)); // 검색 시작
 
-  // await page.waitForSelector("h3", { timeout: 1000 });
-  await page.waitForSelector("h3");
+  const result = selectKeyword(page, crawlingTag);
+  console.log(result);
+  return result;
+};
 
-  const result = await page.evaluate(() => {
-    const anchors = Array.from(document.querySelectorAll("h3"));
-    return anchors.map((anchor) => anchor.textContent);
-  });
+/**
+ * @param {Promise} page 브라우저
+ * @param {Object} crawlingTag 검색 옵션
+ * @return {Array} 검색 데이터
+ */
+const selectKeyword = async (page, crawlingTag) => {
+
+  console.log(typeof page);
+  const itemTag = crawlingTag.google;
+
+  // 해당 콘텐츠가 로드될 때까지 대기
+  await page.waitForSelector(itemTag);
+  const result = await page.evaluate((itemTag) => {
+    const dataList = Array.from(document.querySelectorAll(itemTag));
+    return dataList.map((data) => data.textContent);
+  }, itemTag);
 
   return result;
-}
-
-// (async () => {
-  
-//   // 브라우저를 실행한다.
-//   // 옵션으로 headless모드를 끌 수 있다.
-//   const browser = await puppeteer.launch({
-//     headless: true,
-//   });
-
-//   // 새로운 페이지를 연다.
-//   const page = await browser.newPage();
-
-//   // 페이지의 크기를 설정한다.
-//   // await page.setViewport({
-//   //   width: 1366,
-//   //   height: 768,
-//   // });
-
-//   await page.goto("https://www.google.com/"); // 구글 검색창 이동
-//   await page.type('input[class="gLFyf gsfi"]', "퍼펫티어");
-//   await page.type('input[class="gLFyf gsfi"]', String.fromCharCode(13)); // 엔터키를 입력하여 검색 수행
-
-//   // await page.waitForSelector("h3", { timeout: 1000 });
-//   await page.waitForSelector("h3");
-
-//   const result = await page.evaluate(() => {
-//     const anchors = Array.from(document.querySelectorAll("h3"));
-//     return anchors.map((anchor) => anchor.textContent);
-//   });
-
-//   console.log(result);
-// })();
+};
