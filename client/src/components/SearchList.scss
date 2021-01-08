@@ -1,0 +1,11 @@
+.list {
+    overflow-x: auto;
+    margin-top: 10px;
+    padding: 0 0 20px;
+
+    .inner:after {
+        content: '';
+        display: block;
+        clear: both;
+    }
+}
