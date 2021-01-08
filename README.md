@@ -15,7 +15,7 @@ $ npx create-react-app client --template typescript
 $ npm install http-proxy-middleware
 ```
 
-## Sass 설치(client
+## Sass 설치(client)
 ```
 $ npm install node-sass@4.14.0
 ```
