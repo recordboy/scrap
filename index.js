@@ -31,10 +31,6 @@ console.log(`${port} 포트에서 서버 대기중`);
 //   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 // });
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// Crawling Start
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
 // 크롤링 태그 정보
 const crawlingTag = {
   google: {
@@ -53,6 +49,7 @@ const crawlingTag = {
  * @return {Array} 검색 데이터
  */
 const getSearchData = async (portal, searchText) => {
+  
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
     headless: true,
@@ -60,12 +57,6 @@ const getSearchData = async (portal, searchText) => {
 
   // 브라우저 열기
   const page = await browser.newPage();
-
-  // 브라우저 크기 설정
-  // await page.setViewport({
-  //   width: 1366,
-  //   height: 768,
-  // });
 
   // 포탈 검색
 
