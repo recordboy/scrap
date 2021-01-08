@@ -24,8 +24,6 @@ function App() {
       }
     });
     setPortalList(list);
-    // setIsChangePortal();
-    console.log(portalList);
   };
 
   /**
@@ -35,6 +33,8 @@ function App() {
   const getSearchData = (data: string) => {
     // 검색 요청 카운트
     let count = 0;
+
+    console.log(portalList);
 
     // 각 포털 검색 데이터 리스트
     let dataList: any = [];
