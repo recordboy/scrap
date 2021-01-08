@@ -1,17 +1,14 @@
 import React, { useState } from "react";
 import SearchForm from "./components/SearchForm";
 import SelectForm from "./components/SelectForm";
-import SearchList from "./components/SearchList";
 import PortalArea from "./components/PortalArea";
 import "./App.css";
 
 function App() {
   const [searchData, setSearchData] = useState([]);
-
-  // const [isChangePortal, setIsChangePortal] = useState(true);
   const [portalList, setPortalList] = useState<any>([
-    { Google: true },
-    { NAVER: true },
+    { google: true },
+    { naver: true },
   ]);
 
   /**
@@ -26,16 +23,9 @@ function App() {
         item[id] = isOn;
       }
     });
-
     setPortalList(list);
-
+    // setIsChangePortal();
     console.log(portalList);
-    // // 포탈 목록 변경 감지
-    // if (isChangePortal) {
-    //   setIsChangePortal(false);
-    // } else {
-    //   setIsChangePortal(true);
-    // }
   };
 
   /**
@@ -43,9 +33,12 @@ function App() {
    * @param {String} data 검색 키워드
    */
   const getSearchData = (data: string) => {
-
-    // 포탈 검색 요청 카운트
+    // 검색 요청 카운트
     let count = 0;
+
+    // 각 포털 검색 데이터 리스트
+    let dataList: any = [];
+
     const interval = setInterval(() => {
       count++;
       if (count >= portalList.length) {
@@ -57,13 +50,18 @@ function App() {
       const portalName: string = String(Object.keys(portalList[count]));
 
       // 검색 요청
-      console.log(portalName + " 검색 문구: ", data);
-      fetch(`/api/data?searchText=${data}&portal=${portalName}`)
+      console.log(portalName + "검색 문구: ", data);
+      fetch(`/api/data?portal=${portalName}&searchText=${data}`)
         .then((res) => {
           return res.json();
         })
         .then((data) => {
-          setSearchData(data);
+          dataList.push({ name: portalName, data: data });
+
+          if (dataList.length >= 2) {
+            setSearchData(dataList);
+          }
+
           console.log(portalName + " 검색 결과: ", data);
         });
     });
@@ -72,18 +70,14 @@ function App() {
   return (
     <div className="App" style={{ height: window.innerHeight }}>
       <SearchForm getSearchData={getSearchData} />
-      {/* <SelectForm setIsOnPortal={setIsOnPortal} /> */}
+      <SelectForm portalList={portalList} setIsOnPortal={setIsOnPortal} />
 
+      {searchData.map((item: any, idx: number) => {
+        return (
+          <PortalArea key={idx} portalName={item.name} searchData={item} />
+        );
+      })}
 
-      <SearchList searchData={searchData} />
-      
-      {/* 추가 수정 필요 */}
-      {/* {portalList.map((item: any, idx: number): JSX.Element | undefined => {
-        const portalName: string = String(Object.keys(item));
-        if (item[portalName]) {
-          return <PortalArea key={idx} portalName={portalName} searchData={searchData} />;
-        }
-      })} */}
     </div>
   );
 }
