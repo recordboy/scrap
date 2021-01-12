@@ -12,6 +12,15 @@ const SearchForm = (props: { getSearchData: (data: string) => void }) => {
         onChange={(e) => {
           setSearchText(e.target.value);
         }}
+        onKeyPress={(e: any) => {
+          if (!searchText) {
+            alert("검색어를 입력해주세요");
+            return;
+          }
+          if (e.charCode === 13) {
+            getSearchData(e.target.value);
+          }
+        }}
       />
       <button
         type="button"
