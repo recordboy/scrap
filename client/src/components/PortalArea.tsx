@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import SearchList from "./SearchList";
 import "./PortalArea.scss";
 
@@ -7,6 +7,7 @@ const PortalArea = (props: {
   searchData: any;
 }) => {
   const { portalName, searchData } = props;
+
   return (
     <div>
       <h2>{portalName}</h2>

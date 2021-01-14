@@ -35,11 +35,11 @@ console.log(`${port} 포트에서 서버 대기중`);
 const crawlingTag = {
   google: {
     search: "input[class='gLFyf gsfi']",
-    list: "#rso div.g",
+    contents: "#rso div.g",
   },
   naver: {
     search: "#query",
-    list: "a.api_txt_lines.total_tit",
+    contents: "#main_pack > section.sc_new.sp_ntotal._prs_web_gen._web_gen._sp_ntotal ul.lst_total > li.bx",
   },
 };
 
@@ -49,7 +49,6 @@ const crawlingTag = {
  * @return {Array} 검색 데이터
  */
 const getSearchData = async (portal, searchText) => {
-  
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
     headless: true,
@@ -74,7 +73,7 @@ const getSearchData = async (portal, searchText) => {
   console.log(result);
 
   // 브라우저 닫기
-  browser.close();
+  // browser.close();
   return result;
 };
 
@@ -85,20 +84,46 @@ const getSearchData = async (portal, searchText) => {
  * @return {Array} 검색 데이터
  */
 const selectKeyword = async (page, portal, crawlingTag) => {
-  let itemTag = "";
+  let portalInfo = {};
 
+  portalInfo.portal = portal;
   if (portal === "google") {
-    itemTag = crawlingTag.google.list;
+    portalInfo.tag = crawlingTag.google.contents;
   } else if (portal === "naver") {
-    itemTag = crawlingTag.naver.list;
+    portalInfo.tag = crawlingTag.naver.contents;
   }
 
+  console.log(portalInfo.tag);
+
   // 해당 콘텐츠가 로드될 때까지 대기
-  await page.waitForSelector(itemTag);
-  const result = await page.evaluate((itemTag) => {
-    const dataList = Array.from(document.querySelectorAll(itemTag));
-    return dataList.map((data) => data.textContent);
-  }, itemTag);
+  await page.waitForSelector(portalInfo.tag);
+
+  const result = await page.evaluate((portalInfo) => {
+    const contents = Array.from(document.querySelectorAll(portalInfo.tag));
+    let contentsList = [];
+
+    // 검색 결과 스크래핑
+    contents.forEach((item) => {
+      if (portalInfo.portal === "google") {
+        contentsList.push({
+          title: item.querySelectorAll("h3")[0].innerText, // 타이틀
+          link: item.getElementsByClassName("yuRUbf")[0].children[0].href, // 링크
+          text: item.getElementsByClassName("aCOpRe")[0].textContent, // 내용
+        });
+      } else if (portalInfo.portal === "naver") {
+        contentsList.push({
+          title: item.querySelectorAll("div.total_tit > a")[0].textContent, // 타이틀
+          link: item.querySelectorAll("a")[0].href, // 링크
+          text: item.querySelectorAll("div.total_group > div > a > div")[0].textContent, // 내용
+        });
+      }
+    });
+
+    console.log(contents);
+    console.log(contentsList);
+
+    return contentsList;
+  }, portalInfo);
 
   return result;
 };

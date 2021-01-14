@@ -13,11 +13,11 @@ const SearchForm = (props: { getSearchData: (data: string) => void }) => {
           setSearchText(e.target.value);
         }}
         onKeyPress={(e: any) => {
-          if (!searchText) {
-            alert("검색어를 입력해주세요");
-            return;
-          }
           if (e.charCode === 13) {
+            if (!searchText) {
+              alert("검색어를 입력해주세요");
+              return;
+            }
             getSearchData(e.target.value);
           }
         }}

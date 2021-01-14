@@ -6,7 +6,12 @@ import Loading from "./components/Loading";
 import "./App.css";
 
 function App() {
-  const [searchData, setSearchData] = useState([]);
+  const [searchData, setSearchData] = useState<any>([
+    // {
+    //   name: "",
+    //   data: [{ title: "", link: "", text: "" }],
+    // },
+  ]);
   const [portalList, setPortalList] = useState<any>([
     { google: true },
     { naver: true },

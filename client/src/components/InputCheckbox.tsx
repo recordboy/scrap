@@ -18,7 +18,7 @@ const InputCheckbox = (props: {
           setIsOnPortal(id, e.target.checked);
         }}
       />
-      <label htmlFor={id}></label>
+      <label htmlFor={id}>{id}</label>
     </div>
   );
 };
