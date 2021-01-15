@@ -39,7 +39,8 @@ const crawlingTag = {
   },
   naver: {
     search: "#query",
-    contents: "#main_pack > section.sc_new.sp_ntotal._prs_web_gen._web_gen._sp_ntotal ul.lst_total > li.bx",
+    contents:
+      "#main_pack > section.sc_new.sp_ntotal._prs_web_gen._web_gen._sp_ntotal ul.lst_total > li.bx",
   },
 };
 
@@ -51,7 +52,7 @@ const crawlingTag = {
 const getSearchData = async (portal, searchText) => {
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
   });
 
   // 브라우저 열기
@@ -93,28 +94,44 @@ const selectKeyword = async (page, portal, crawlingTag) => {
     portalInfo.tag = crawlingTag.naver.contents;
   }
 
-  console.log(portalInfo.tag);
+  try {
+    // 해당 콘텐츠가 로드될 때까지 대기
+    await page.waitForSelector(portalInfo.tag, { timeout: 1000 });
+  } catch (error) {
+    console.log("오류 발생: " + error);
+    return [
+      {
+        title: "검색 결과 없음",
+        link: "",
+        text: "",
+      },
+    ];
+  }
 
-  // 해당 콘텐츠가 로드될 때까지 대기
-  await page.waitForSelector(portalInfo.tag);
-
+  // 여기서부터는 퍼펫티어(크로뮴) 영역
   const result = await page.evaluate((portalInfo) => {
+    console.log(111);
+
     const contents = Array.from(document.querySelectorAll(portalInfo.tag));
     let contentsList = [];
 
     // 검색 결과 스크래핑
     contents.forEach((item) => {
+      // google
       if (portalInfo.portal === "google") {
         contentsList.push({
           title: item.querySelectorAll("h3")[0].innerText, // 타이틀
           link: item.getElementsByClassName("yuRUbf")[0].children[0].href, // 링크
           text: item.getElementsByClassName("aCOpRe")[0].textContent, // 내용
         });
+
+        // naver
       } else if (portalInfo.portal === "naver") {
         contentsList.push({
           title: item.querySelectorAll("div.total_tit > a")[0].textContent, // 타이틀
           link: item.querySelectorAll("a")[0].href, // 링크
-          text: item.querySelectorAll("div.total_group > div > a > div")[0].textContent, // 내용
+          text: item.querySelectorAll("div.total_group > div > a > div")[0]
+            .textContent, // 내용
         });
       }
     });
