@@ -75,7 +75,7 @@ function App() {
 
       // 호출 횟수 증가
       callIdx++;
-
+      
       console.log(portalName + "검색 문구: ", data);
 
       // 로딩 화면 노출
