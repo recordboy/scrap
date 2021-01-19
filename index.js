@@ -23,13 +23,13 @@ app.listen(port);
 
 console.log(`${port} 포트에서 서버 대기중`);
 
-// // 리액트 정적 파일 제공
-// app.use(express.static(path.join(__dirname, 'client/build')));
+// 리액트 정적 파일 제공
+app.use(express.static(path.join(__dirname, 'client/build')));
 
-// // 라우트 설정
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname+'/client/build/index.html'));
-// });
+// 라우트 설정
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
 
 // 크롤링 태그 정보
 const crawlingTag = {
