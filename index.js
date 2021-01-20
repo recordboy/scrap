@@ -78,7 +78,7 @@ const getSearchData = async (portal, searchText) => {
   console.log(result);
 
   // 브라우저 닫기
-  // browser.close();
+  browser.close();
   return result;
 };
 
