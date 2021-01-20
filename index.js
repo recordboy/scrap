@@ -100,7 +100,7 @@ const selectKeyword = async (page, portal, crawlingTag) => {
 
   try {
     // 해당 콘텐츠가 로드될 때까지 대기
-    await page.waitForSelector(portalInfo.tag, { timeout: 1000 });
+    await page.waitForSelector(portalInfo.tag, { timeout: 5000 });
   } catch (error) {
     console.log("오류 발생: " + error);
     return [
