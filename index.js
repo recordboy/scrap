@@ -52,7 +52,11 @@ const crawlingTag = {
 const getSearchData = async (portal, searchText) => {
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+    ],  
   });
 
   // 브라우저 열기
