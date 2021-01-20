@@ -4,7 +4,7 @@ module.exports = function (app) {
   app.use(
     "/api/data",
     createProxyMiddleware({
-      target: "https://recordboy-scrap.herokuapp.com",
+      target: "http://localhost:5000",
       changeOrigin: true,
     })
   );

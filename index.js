@@ -56,7 +56,7 @@ const getSearchData = async (portal, searchText) => {
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox'
-    ],  
+    ]
   });
 
   // 브라우저 열기
