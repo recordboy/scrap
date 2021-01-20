@@ -58,6 +58,9 @@ async function getSearchData(portal, searchText) {
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
+  // 검색 데이터
+  let result = {};
+
   // 브라우저 열기
   const page = await browser.newPage();
 
@@ -70,15 +73,15 @@ async function getSearchData(portal, searchText) {
   // 검색 시작
   await page.type(crawlingTag[portal].search, String.fromCharCode(13));
 
-  const result = await selectKeyword(page, portal, crawlingTag);
+  
+  
+  // result.main = await selectKeyword(page, portal, crawlingTag);
+  result = await selectKeyword(page, portal, crawlingTag);
   console.log(result);
 
 
 
 
-
-
-  
     // 구글 이미지 검색
     await page.click('#hdtb-msb-vis > div:nth-child(3) > a');
   
@@ -88,20 +91,14 @@ async function getSearchData(portal, searchText) {
       const contents = Array.from(document.querySelectorAll('#islrg > div.islrc > div'));
       let contentsList = [];
       contents.forEach((item) => {
-        console.log(item);
+        contentsList.push(item.querySelector('img').src);
+        console.log(item.querySelector('img').src);
       });
       return contentsList;
     });
+
     console.log(imgList);
-
-
-
-
-
-
-
-
-
+    
 
 
 
@@ -176,4 +173,6 @@ async function selectKeyword(page, portal, crawlingTag) {
 
   return result;
 }
+
+
 
