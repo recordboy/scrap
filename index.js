@@ -10,6 +10,15 @@ const app = express();
 // path 모듈 불러오기
 const path = require("path");
 
+// 크롤러 모듈
+const moduleGoogle = require("./crawler_modules/google");
+module.exports = moduleGoogle;
+// 기본 포트를 app 객체에 설정
+const port = process.env.PORT || 5000;
+app.listen(port);
+
+console.log(`${port} 포트에서 서버 대기중`);
+
 // 검색 요청 api
 app.use("/api/data", async function (req, res) {
   console.log("검색 포탈: ", req.query.portal);
@@ -17,18 +26,11 @@ app.use("/api/data", async function (req, res) {
   res.json(await getSearchData(req.query.portal, req.query.searchText));
 });
 
-// 기본 포트를 app 객체에 설정
-const port = process.env.PORT || 5000;
-app.listen(port);
-
-console.log(`${port} 포트에서 서버 대기중`);
-
-// 리액트 정적 파일 제공
-app.use(express.static(path.join(__dirname, 'client/build')));
-
-// 라우트 설정
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+// 리액트 정적 파일 제공 (헤로쿠 빌드 전용)
+app.use(express.static(path.join(__dirname, "client/build")));
+// 라우트 설정 (헤로쿠 빌드 전용)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
 // 크롤링 태그 정보
@@ -49,38 +51,67 @@ const crawlingTag = {
  * @param {String} searchText 검색 문구
  * @return {Array} 검색 데이터
  */
-const getSearchData = async (portal, searchText) => {
+async function getSearchData(portal, searchText) {
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
-    headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox'
-    ]
+    headless: false,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
   // 브라우저 열기
   const page = await browser.newPage();
 
-  // 포탈 검색
+  // 포탈로 이동
+  await page.goto(`https://www.${portal}.com/`);
 
-  if (portal === "google") {
-    await page.goto("https://www.google.com/");
-    await page.type(crawlingTag.google.search, searchText);
-    await page.type(crawlingTag.google.search, String.fromCharCode(13));
-  } else if (portal === "naver") {
-    await page.goto("https://www.naver.com/");
-    await page.type(crawlingTag.naver.search, searchText);
-    await page.type(crawlingTag.naver.search, String.fromCharCode(13));
-  }
+  //  검색어 입력
+  await page.type(crawlingTag[portal].search, searchText);
+
+  // 검색 시작
+  await page.type(crawlingTag[portal].search, String.fromCharCode(13));
 
   const result = await selectKeyword(page, portal, crawlingTag);
   console.log(result);
 
+
+
+
+
+
+  
+    // 구글 이미지 검색
+    await page.click('#hdtb-msb-vis > div:nth-child(3) > a');
+  
+    // 로딩 대기
+    await page.waitForSelector('#islrg > div.islrc > div', { timeout: 5000 });
+    const imgList = await page.evaluate(() => {
+      const contents = Array.from(document.querySelectorAll('#islrg > div.islrc > div'));
+      let contentsList = [];
+      contents.forEach((item) => {
+        console.log(item);
+      });
+      return contentsList;
+    });
+    console.log(imgList);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // 브라우저 닫기
-  browser.close();
+  // browser.close();
   return result;
-};
+}
 
 /**
  * @param {Promise} page 브라우저
@@ -88,20 +119,18 @@ const getSearchData = async (portal, searchText) => {
  * @param {Object} crawlingTag 검색 옵션
  * @return {Array} 검색 데이터
  */
-const selectKeyword = async (page, portal, crawlingTag) => {
-  let portalInfo = {};
+async function selectKeyword(page, portal, crawlingTag) {
+  let portalInfo = {}; // 검색 브라우저에 전달할 정보
+  portalInfo.portal = portal; // 포탈 이름
+  portalInfo.tag = crawlingTag[portal].contents; // 콘텐츠가 담겨있는 태그 이름
 
-  portalInfo.portal = portal;
-  if (portal === "google") {
-    portalInfo.tag = crawlingTag.google.contents;
-  } else if (portal === "naver") {
-    portalInfo.tag = crawlingTag.naver.contents;
-  }
-
+  // 예외 처리
   try {
     // 해당 콘텐츠가 로드될 때까지 대기
     await page.waitForSelector(portalInfo.tag, { timeout: 5000 });
+
   } catch (error) {
+    // 해당 태그가 없을 시 검색 결과 없음 반환
     console.log("오류 발생: " + error);
     return [
       {
@@ -112,10 +141,9 @@ const selectKeyword = async (page, portal, crawlingTag) => {
     ];
   }
 
-  // 여기서부터는 퍼펫티어(크로뮴) 영역
+  // 퍼펫티어(크로뮴) 영역
   const result = await page.evaluate((portalInfo) => {
-    console.log(111);
-
+    // 검색된 돔 요소를 배열에 담음 
     const contents = Array.from(document.querySelectorAll(portalInfo.tag));
     let contentsList = [];
 
@@ -140,11 +168,12 @@ const selectKeyword = async (page, portal, crawlingTag) => {
       }
     });
 
-    console.log(contents);
-    console.log(contentsList);
+    console.log(contents); // 검색 콘텐츠
+    console.log(contentsList); // 크롤링한 콘텐츠 자원
 
     return contentsList;
   }, portalInfo);
 
   return result;
-};
+}
+

@@ -14,7 +14,7 @@ function App() {
   ]);
   const [portalList, setPortalList] = useState<any>([
     { google: true },
-    { naver: true },
+    { naver: false },
   ]);
 
   const [isOnLoading, setIsOnLoading] = useState(false);
