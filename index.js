@@ -11,8 +11,9 @@ const app = express();
 const path = require("path");
 
 // 크롤러 모듈
-const moduleGoogle = require("./crawler_modules/google");
-module.exports = moduleGoogle;
+const googleImgSrc = require("./crawler_modules/google/imgSrc");
+module.exports = googleImgSrc;
+
 // 기본 포트를 app 객체에 설정
 const port = process.env.PORT || 5000;
 app.listen(port);
@@ -54,7 +55,7 @@ const crawlingTag = {
 async function getSearchData(portal, searchText) {
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
@@ -79,19 +80,11 @@ async function getSearchData(portal, searchText) {
   // 검색 메인화면 콘텐츠 리스트 생성
   result.mainCnt = await selectKeyword(page, portal, crawlingTag);
 
-
-
-
-
-
-
-
-  
-  // console.log(crawlerGoogle);
-  // crawlerGoogle();
+  // 이미지 경로 리스트 생성
+  result.imgUrl = await googleImgSrc(page);
 
   // 브라우저 닫기
-  // browser.close();
+  browser.close();
   return result;
 }
 

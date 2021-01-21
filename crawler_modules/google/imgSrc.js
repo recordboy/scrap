@@ -1,7 +1,8 @@
 /**
- * google
+ * @param {Promise} page 브라우저
+ * @return {Array} 검색 데이터
  */
-async function crawlerGoogle() {
+ async function googleImgSrc(page) {
 
   // 구글 이미지 검색
   await page.click("#hdtb-msb-vis > div:nth-child(3) > a");
@@ -20,10 +21,7 @@ async function crawlerGoogle() {
     });
     return contentsList;
   });
-  // 이미지 경로 리스트 생성
-  result.imgUrl = imgUrlList;
-
-  console.log(imgUrlList);
+  return imgUrlList;
 }
 
-module.exports = crawlerGoogle;
+module.exports = googleImgSrc;
