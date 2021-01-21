@@ -59,7 +59,10 @@ async function getSearchData(portal, searchText) {
   });
 
   // 검색 데이터
-  let result = {};
+  let result = {
+    mainCnt: [],
+    imgUrl: [],
+  };
 
   // 브라우저 열기
   const page = await browser.newPage();
@@ -73,37 +76,19 @@ async function getSearchData(portal, searchText) {
   // 검색 시작
   await page.type(crawlingTag[portal].search, String.fromCharCode(13));
 
+  // 검색 메인화면 콘텐츠 리스트 생성
+  result.mainCnt = await selectKeyword(page, portal, crawlingTag);
+
+
+
+
+
+
+
+
   
-  
-  // result.main = await selectKeyword(page, portal, crawlingTag);
-  result = await selectKeyword(page, portal, crawlingTag);
-  console.log(result);
-
-
-
-
-    // 구글 이미지 검색
-    await page.click('#hdtb-msb-vis > div:nth-child(3) > a');
-  
-    // 로딩 대기
-    await page.waitForSelector('#islrg > div.islrc > div', { timeout: 5000 });
-    const imgList = await page.evaluate(() => {
-      const contents = Array.from(document.querySelectorAll('#islrg > div.islrc > div'));
-      let contentsList = [];
-      contents.forEach((item) => {
-        contentsList.push(item.querySelector('img').src);
-        console.log(item.querySelector('img').src);
-      });
-      return contentsList;
-    });
-
-    console.log(imgList);
-    
-
-
-
-
-
+  // console.log(crawlerGoogle);
+  // crawlerGoogle();
 
   // 브라우저 닫기
   // browser.close();
@@ -125,7 +110,6 @@ async function selectKeyword(page, portal, crawlingTag) {
   try {
     // 해당 콘텐츠가 로드될 때까지 대기
     await page.waitForSelector(portalInfo.tag, { timeout: 5000 });
-
   } catch (error) {
     // 해당 태그가 없을 시 검색 결과 없음 반환
     console.log("오류 발생: " + error);
@@ -140,7 +124,7 @@ async function selectKeyword(page, portal, crawlingTag) {
 
   // 퍼펫티어(크로뮴) 영역
   const result = await page.evaluate((portalInfo) => {
-    // 검색된 돔 요소를 배열에 담음 
+    // 검색된 돔 요소를 배열에 담음
     const contents = Array.from(document.querySelectorAll(portalInfo.tag));
     let contentsList = [];
 
@@ -173,6 +157,3 @@ async function selectKeyword(page, portal, crawlingTag) {
 
   return result;
 }
-
-
-
