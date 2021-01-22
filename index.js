@@ -12,6 +12,7 @@ const path = require("path");
 
 // 크롤러 모듈
 const googleImgSrc = require("./crawler_modules/google/imgSrc");
+const { callbackify } = require("util");
 module.exports = googleImgSrc;
 
 // 기본 포트를 app 객체에 설정
@@ -55,8 +56,12 @@ const crawlingTag = {
 async function getSearchData(portal, searchText) {
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    headless: false,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--window-size=900,2000",
+    ],
   });
 
   // 검색 데이터
@@ -80,11 +85,39 @@ async function getSearchData(portal, searchText) {
   // 검색 메인화면 콘텐츠 리스트 생성
   result.mainCnt = await selectKeyword(page, portal, crawlingTag);
 
+  // let btnLength = await page.evaluate(() => {
+  //   const imgBtns = document.querySelectorAll(
+  //     "#xjs > div > table > tbody > tr > td"
+  //   );
+  //   return imgBtns.length;
+  // });
+
+  const isOnNextPage = await page.evaluate(() => {
+    const nextBtn = document.querySelector("#pnnext");
+    if (nextBtn) {
+      return true;
+    }
+  });
+
+  if (isOnNextPage) {
+    for (let i = 0; i < 20; i++) {
+      await page.evaluate(() => {
+        const nextBtn = document.querySelector("#pnnext");
+        if (nextBtn) {
+          document.querySelector("#pnnext").click();
+        }
+      });
+
+      // 검색 메인화면 콘텐츠 리스트 추가 생성
+      result.mainCnt.push(...(await selectKeyword(page, portal, crawlingTag)));
+    }
+  }
+
   // 이미지 경로 리스트 생성
-  result.imgUrl = await googleImgSrc(page);
+  // result.imgUrl = await googleImgSrc(page);
 
   // 브라우저 닫기
-  browser.close();
+  // browser.close();
   return result;
 }
 
@@ -102,7 +135,7 @@ async function selectKeyword(page, portal, crawlingTag) {
   // 예외 처리
   try {
     // 해당 콘텐츠가 로드될 때까지 대기
-    await page.waitForSelector(portalInfo.tag, { timeout: 5000 });
+    await page.waitForSelector(portalInfo.tag, { timeout: 10000 });
   } catch (error) {
     // 해당 태그가 없을 시 검색 결과 없음 반환
     console.log("오류 발생: " + error);
@@ -125,11 +158,13 @@ async function selectKeyword(page, portal, crawlingTag) {
     contents.forEach((item) => {
       // google
       if (portalInfo.portal === "google") {
-        contentsList.push({
-          title: item.querySelectorAll("h3")[0].innerText, // 타이틀
-          link: item.getElementsByClassName("yuRUbf")[0].children[0].href, // 링크
-          text: item.getElementsByClassName("aCOpRe")[0].textContent, // 내용
-        });
+        if (item.className === "g") {
+          contentsList.push({
+            title: item.querySelectorAll("h3")[0].textContent, // 타이틀
+            link: item.getElementsByClassName("yuRUbf")[0].children[0].href, // 링크
+            text: item.getElementsByClassName("aCOpRe")[0].textContent, // 내용
+          });
+        }
 
         // naver
       } else if (portalInfo.portal === "naver") {

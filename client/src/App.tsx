@@ -43,7 +43,7 @@ function App() {
     let dataList: any = [];
 
     // let isOnportalIdx: number = 0;
-    // portalList.forEach((item: any, idx: number) => {
+    // portalList.forEach((item: any, idx: number) => {f
     //   const portalName: string = String(Object.keys(portalList[idx]));
     //   if (portalList[idx][portalName]) {
     //     isOnportalIdx ++;

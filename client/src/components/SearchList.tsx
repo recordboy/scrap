@@ -7,11 +7,18 @@ const SearchList = (props: { searchData: any }) => {
 
   return (
     <div className="list">
-      <div className="inner" style={{ width: searchData.data.mainCnt.length * 210 - 10 }}>
-        {searchData.data.mainCnt.map((item: any, idx: number) => {
-          return <SearchItem key={idx} item={item} />;
-        })}
-      </div>
+      {searchData.data.mainCnt.map((item: any, idx: number) => {
+        return <SearchItem key={idx} item={item} />;
+      })}
+      {/* <div className="inner img" style={{ width: searchData.data.imgUrl.length * 210 - 10 }}>
+              {searchData.data.imgUrl.map((item: any, idx: number) => {
+                return (
+                  <div className="item">
+                    <img src={item} alt="" />
+                  </div>
+                );
+              })}
+            </div> */}
     </div>
   );
 };
