@@ -56,7 +56,7 @@ const crawlingTag = {
 async function getSearchData(portal, searchText) {
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
@@ -117,7 +117,7 @@ async function getSearchData(portal, searchText) {
   // result.imgUrl = await googleImgSrc(page);
 
   // 브라우저 닫기
-  // browser.close();
+  browser.close();
   return result;
 }
 
