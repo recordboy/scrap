@@ -43,7 +43,8 @@ const crawlingTag = {
   naver: {
     search: "#query",
     contents:
-      "#main_pack > section.sc_new.sp_ntotal._prs_web_gen._web_gen._sp_ntotal ul.lst_total > li.bx",
+      // "#main_pack > section.sc_new.sp_ntotal._prs_web_gen._web_gen._sp_ntotal ul.lst_total > li.bx",
+      "#main_pack > section.sc_new",
   },
 };
 
@@ -55,11 +56,11 @@ const crawlingTag = {
 async function getSearchData(portal, searchText) {
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
-      "--window-size=900,2000",
+      "--window-size=1600,2000",
     ],
   });
 
@@ -100,6 +101,7 @@ async function getSearchData(portal, searchText) {
   // 최대 25번 다음페이지 출력
   if (isOnNextPage) {
     for (let i = 0; i < 25; i++) {
+      console.log(i);
       await page.evaluate(() => {
         const nextBtn = document.querySelector("#pnnext");
         if (nextBtn) {
@@ -116,7 +118,7 @@ async function getSearchData(portal, searchText) {
   // result.imgUrl = await googleImgSrc(page);
 
   // 브라우저 닫기
-  browser.close();
+  // browser.close();
   return result;
 }
 
@@ -154,17 +156,18 @@ async function selectKeyword(page, portal, crawlingTag) {
       // 검색된 돔 요소를 배열에 담음
       const contents = Array.from(document.querySelectorAll(portalInfo.tag));
       let contentsList = [];
-      
+      debugger
+
       // 검색 결과 스크래핑
       contents.forEach((item) => {
         // google
         if (portalInfo.portal === "google") {
           if (item.className === "g") {
-            const title = item.querySelectorAll("h3")[0];
+            const title = item.querySelector("h3");
             const link = item.getElementsByClassName("yuRUbf")[0];
             const text = item.getElementsByClassName("aCOpRe")[0];
 
-            if (title && link  && text) {
+            if (title && link && text) {
               contentsList.push({
                 title: title.textContent, // 타이틀
                 link: link.children[0].href, // 링크
@@ -175,6 +178,34 @@ async function selectKeyword(page, portal, crawlingTag) {
 
           // naver
         } else if (portalInfo.portal === "naver") {
+          let itemList = [];
+          let name = item.className;
+          debugger;
+
+          if (name.indexOf("sp_ndic") > -1) {
+            return;
+          } else if (name.indexOf("sp_nkindic") > -1) {
+            itemList = section.querySelectorAll(".nkindic_basic");
+            itemList.forEach((item) => {
+              contentsList.push({
+                title: item.querySelector("h3").textContent, // 타이틀
+                link: item.querySelector("a").href, // 링크
+                text: item.querySelector(".api_txt_lines").textContent, // 내용
+              });
+            });
+          } else if (name.indexOf("sp_nreview") > -1) {
+            itemList = section.querySelectorAll(".bx");
+            itemList.forEach((item) => {
+              contentsList.push({
+                title: item.querySelector(".api_txt_lines").textContent, // 타이틀
+                link: item.querySelector(".api_txt_lines").href, // 링크
+                text: item.querySelector(".api_txt_lines.dsc_txt").textContent, // 내용
+              });
+            });
+
+          } else {
+          }
+
           contentsList.push({
             title: item.querySelectorAll("div.total_tit > a")[0].textContent, // 타이틀
             link: item.querySelectorAll("a")[0].href, // 링크
