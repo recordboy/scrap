@@ -12,7 +12,6 @@ const path = require("path");
 
 // 크롤러 모듈
 const googleImgSrc = require("./crawler_modules/google/imgSrc");
-const { callbackify } = require("util");
 module.exports = googleImgSrc;
 
 // 기본 포트를 app 객체에 설정
@@ -82,7 +81,6 @@ async function getSearchData(portal, searchText) {
   // 검색 시작
   await page.type(crawlingTag[portal].search, String.fromCharCode(13));
 
-  // 검색 메인화면 콘텐츠 리스트 생성
   result.mainCnt = await selectKeyword(page, portal, crawlingTag);
 
   // let btnLength = await page.evaluate(() => {
@@ -99,8 +97,9 @@ async function getSearchData(portal, searchText) {
     }
   });
 
+  // 최대 25번 다음페이지 출력
   if (isOnNextPage) {
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 25; i++) {
       await page.evaluate(() => {
         const nextBtn = document.querySelector("#pnnext");
         if (nextBtn) {
@@ -138,7 +137,7 @@ async function selectKeyword(page, portal, crawlingTag) {
     await page.waitForSelector(portalInfo.tag, { timeout: 10000 });
   } catch (error) {
     // 해당 태그가 없을 시 검색 결과 없음 반환
-    console.log("오류 발생: " + error);
+    console.log("에러 발생: " + error);
     return [
       {
         title: "검색 결과 없음",
@@ -148,40 +147,53 @@ async function selectKeyword(page, portal, crawlingTag) {
     ];
   }
 
-  // 퍼펫티어(크로뮴) 영역
-  const result = await page.evaluate((portalInfo) => {
-    // 검색된 돔 요소를 배열에 담음
-    const contents = Array.from(document.querySelectorAll(portalInfo.tag));
-    let contentsList = [];
+  // 예외 처리
+  try {
+    // 퍼펫티어(크로뮴) 영역
+    const result = await page.evaluate((portalInfo) => {
+      // 검색된 돔 요소를 배열에 담음
+      const contents = Array.from(document.querySelectorAll(portalInfo.tag));
+      let contentsList = [];
+      
+      // 검색 결과 스크래핑
+      contents.forEach((item) => {
+        // google
+        if (portalInfo.portal === "google") {
+          if (item.className === "g") {
+            const title = item.querySelectorAll("h3")[0];
+            const link = item.getElementsByClassName("yuRUbf")[0];
+            const text = item.getElementsByClassName("aCOpRe")[0];
 
-    // 검색 결과 스크래핑
-    contents.forEach((item) => {
-      // google
-      if (portalInfo.portal === "google") {
-        if (item.className === "g") {
+            if (title && link  && text) {
+              contentsList.push({
+                title: title.textContent, // 타이틀
+                link: link.children[0].href, // 링크
+                text: text.textContent, // 내용
+              });
+            }
+          }
+
+          // naver
+        } else if (portalInfo.portal === "naver") {
           contentsList.push({
-            title: item.querySelectorAll("h3")[0].textContent, // 타이틀
-            link: item.getElementsByClassName("yuRUbf")[0].children[0].href, // 링크
-            text: item.getElementsByClassName("aCOpRe")[0].textContent, // 내용
+            title: item.querySelectorAll("div.total_tit > a")[0].textContent, // 타이틀
+            link: item.querySelectorAll("a")[0].href, // 링크
+            text: item.querySelectorAll("div.total_group > div > a > div")[0]
+              .textContent, // 내용
           });
         }
+      });
 
-        // naver
-      } else if (portalInfo.portal === "naver") {
-        contentsList.push({
-          title: item.querySelectorAll("div.total_tit > a")[0].textContent, // 타이틀
-          link: item.querySelectorAll("a")[0].href, // 링크
-          text: item.querySelectorAll("div.total_group > div > a > div")[0]
-            .textContent, // 내용
-        });
-      }
-    });
+      console.log(contents); // 검색 콘텐츠
+      console.log(contentsList); // 크롤링한 콘텐츠 자원
 
-    console.log(contents); // 검색 콘텐츠
-    console.log(contentsList); // 크롤링한 콘텐츠 자원
+      return contentsList;
+    }, portalInfo);
 
-    return contentsList;
-  }, portalInfo);
-
-  return result;
+    return result;
+  } catch (error) {
+    // 에러 발생 시 에러 객체 반환
+    console.log("에러 발생: " + error);
+    return error;
+  }
 }
