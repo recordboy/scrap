@@ -12,6 +12,7 @@ const SearchItem = (props: { item: any }) => {
         </a>
       </div>
       <div className="text">{item.text}</div>
+      <div className="kategorie">{item.kategorie}</div>
     </div>
   );
 };

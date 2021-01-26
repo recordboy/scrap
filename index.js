@@ -42,9 +42,7 @@ const crawlingTag = {
   },
   naver: {
     search: "#query",
-    contents:
-      // "#main_pack > section.sc_new.sp_ntotal._prs_web_gen._web_gen._sp_ntotal ul.lst_total > li.bx",
-      "#main_pack > section.sc_new",
+    contents: "#main_pack > section.sc_new",
   },
 };
 
@@ -56,7 +54,7 @@ const crawlingTag = {
 async function getSearchData(portal, searchText) {
   // 브라우저 실행, 옵션 headless모드
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
@@ -165,12 +163,14 @@ async function selectKeyword(page, portal, crawlingTag) {
             const title = item.querySelector("h3");
             const link = item.getElementsByClassName("yuRUbf")[0];
             const text = item.getElementsByClassName("aCOpRe")[0];
+            const kategorie = item.getElementsByClassName("iUh30 ")[0];
 
             if (title && link && text) {
               contentsList.push({
                 title: title.textContent, // 타이틀
                 link: link.children[0].href, // 링크
                 text: text.textContent, // 내용
+                kategorie: kategorie.textContent, // 카테고리
               });
             }
           }
@@ -182,23 +182,53 @@ async function selectKeyword(page, portal, crawlingTag) {
           let title = "";
           let link = "";
           let text = "";
+          let kategorie = "";
 
+          // 국어사전
           if (name.indexOf("sp_ndic") > -1) {
             return;
+
+            // 검색결과
+          } else if (name.indexOf("sp_ntotal") > -1) {
+            itemList = item.querySelectorAll(".bx");
+            itemList.forEach((item) => {
+              title = item.querySelector(".total_tit");
+              link = item.querySelector("a");
+              text = item.querySelector(".api_txt_lines.dsc_txt");
+              kategorie = "검색결과";
+              addData();
+            });
+
+            // 지식백과
           } else if (name.indexOf("sp_nkindic") > -1) {
             itemList = item.querySelectorAll(".nkindic_basic");
             itemList.forEach((item) => {
               title = item.querySelector("h3");
               link = item.querySelector("a");
-              text = item.querySelector(".api_txt_lines");
+              kategorie = "지식백과";
               addData();
             });
+
+            // view
           } else if (name.indexOf("sp_nreview") > -1) {
             itemList = item.querySelectorAll(".bx");
             itemList.forEach((item) => {
               title = item.querySelector(".api_txt_lines");
               link = item.querySelector(".api_txt_lines");
               text = item.querySelector(".api_txt_lines.dsc_txt");
+              text = item.querySelector(".api_txt_lines.dsc_txt");
+              kategorie = "view";
+              addData();
+            });
+
+            // 뉴스
+          } else if (name.indexOf("sp_nnews") > -1) {
+            itemList = item.querySelectorAll(".bx");
+            itemList.forEach((item) => {
+              title = item.querySelector(".news_tit");
+              link = item.querySelector(".news_tit");
+              text = item.querySelector(".api_txt_lines.dsc_txt_wrap");
+              kategorie = "뉴스";
               addData();
             });
           }
@@ -209,6 +239,7 @@ async function selectKeyword(page, portal, crawlingTag) {
                 title: title.textContent, // 타이틀
                 link: link.href, // 링크
                 text: text.textContent, // 내용
+                kategorie: kategorie, // 카테고리
               });
             }
           }
