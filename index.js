@@ -205,6 +205,7 @@ async function selectKeyword(page, portal, crawlingTag) {
             itemList.forEach((item) => {
               title = item.querySelector("h3");
               link = item.querySelector("a");
+              text = item.querySelector(".api_txt_lines.dsc_txt");
               kategorie = "지식백과";
               addData();
             });
@@ -215,7 +216,6 @@ async function selectKeyword(page, portal, crawlingTag) {
             itemList.forEach((item) => {
               title = item.querySelector(".api_txt_lines");
               link = item.querySelector(".api_txt_lines");
-              text = item.querySelector(".api_txt_lines.dsc_txt");
               text = item.querySelector(".api_txt_lines.dsc_txt");
               kategorie = "view";
               addData();

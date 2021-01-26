@@ -8,8 +8,7 @@ const SearchItem = (props: { item: any }) => {
     <div className="card">
       <div className="title">
         {item.title}
-        <a className="link" href={item.link} target="_blank" rel="noreferrer">바로가기
-        </a>
+        <a className="link" href={item.link} target="_blank" rel="noreferrer"><i className="fa fa-external-link-alt"></i></a>
       </div>
       <div className="text">{item.text}</div>
       <div className="kategorie">{item.kategorie}</div>
