@@ -179,39 +179,38 @@ async function selectKeyword(page, portal, crawlingTag) {
         } else if (portalInfo.portal === "naver") {
           let itemList = [];
           let name = item.className;
+          let title = "";
+          let link = "";
+          let text = "";
 
           if (name.indexOf("sp_ndic") > -1) {
             return;
           } else if (name.indexOf("sp_nkindic") > -1) {
             itemList = item.querySelectorAll(".nkindic_basic");
             itemList.forEach((item) => {
-              const title = item.querySelector("h3");
-              const link = item.querySelector("a")[0];
-              const text = item.querySelector(".api_txt_lines");
-
-              if (title && link && text) {
-                contentsList.push({
-                  title: title.textContent, // 타이틀
-                  link: link.href, // 링크
-                  text: text.textContent, // 내용
-                });
-              }
+              title = item.querySelector("h3");
+              link = item.querySelector("a");
+              text = item.querySelector(".api_txt_lines");
+              addData();
             });
           } else if (name.indexOf("sp_nreview") > -1) {
             itemList = item.querySelectorAll(".bx");
             itemList.forEach((item) => {
-              const title = item.querySelector(".api_txt_lines");
-              const link = item.querySelector(".api_txt_lines");
-              const text = item.querySelector(".api_txt_lines.dsc_txt");
-
-              if (title && link && text) {
-                contentsList.push({
-                  title: title.textContent, // 타이틀
-                  link: link.href, // 링크
-                  text: text.textContent, // 내용
-                });
-              }
+              title = item.querySelector(".api_txt_lines");
+              link = item.querySelector(".api_txt_lines");
+              text = item.querySelector(".api_txt_lines.dsc_txt");
+              addData();
             });
+          }
+
+          function addData() {
+            if (title && link && text) {
+              contentsList.push({
+                title: title.textContent, // 타이틀
+                link: link.href, // 링크
+                text: text.textContent, // 내용
+              });
+            }
           }
         }
       });
