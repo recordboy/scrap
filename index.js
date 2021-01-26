@@ -156,7 +156,6 @@ async function selectKeyword(page, portal, crawlingTag) {
       // 검색된 돔 요소를 배열에 담음
       const contents = Array.from(document.querySelectorAll(portalInfo.tag));
       let contentsList = [];
-      debugger
 
       // 검색 결과 스크래핑
       contents.forEach((item) => {
@@ -180,38 +179,40 @@ async function selectKeyword(page, portal, crawlingTag) {
         } else if (portalInfo.portal === "naver") {
           let itemList = [];
           let name = item.className;
-          debugger;
 
           if (name.indexOf("sp_ndic") > -1) {
             return;
           } else if (name.indexOf("sp_nkindic") > -1) {
-            itemList = section.querySelectorAll(".nkindic_basic");
+            itemList = item.querySelectorAll(".nkindic_basic");
             itemList.forEach((item) => {
-              contentsList.push({
-                title: item.querySelector("h3").textContent, // 타이틀
-                link: item.querySelector("a").href, // 링크
-                text: item.querySelector(".api_txt_lines").textContent, // 내용
-              });
+              const title = item.querySelector("h3");
+              const link = item.querySelector("a")[0];
+              const text = item.querySelector(".api_txt_lines");
+
+              if (title && link && text) {
+                contentsList.push({
+                  title: title.textContent, // 타이틀
+                  link: link.href, // 링크
+                  text: text.textContent, // 내용
+                });
+              }
             });
           } else if (name.indexOf("sp_nreview") > -1) {
-            itemList = section.querySelectorAll(".bx");
+            itemList = item.querySelectorAll(".bx");
             itemList.forEach((item) => {
-              contentsList.push({
-                title: item.querySelector(".api_txt_lines").textContent, // 타이틀
-                link: item.querySelector(".api_txt_lines").href, // 링크
-                text: item.querySelector(".api_txt_lines.dsc_txt").textContent, // 내용
-              });
+              const title = item.querySelector(".api_txt_lines");
+              const link = item.querySelector(".api_txt_lines");
+              const text = item.querySelector(".api_txt_lines.dsc_txt");
+
+              if (title && link && text) {
+                contentsList.push({
+                  title: title.textContent, // 타이틀
+                  link: link.href, // 링크
+                  text: text.textContent, // 내용
+                });
+              }
             });
-
-          } else {
           }
-
-          contentsList.push({
-            title: item.querySelectorAll("div.total_tit > a")[0].textContent, // 타이틀
-            link: item.querySelectorAll("a")[0].href, // 링크
-            text: item.querySelectorAll("div.total_group > div > a > div")[0]
-              .textContent, // 내용
-          });
         }
       });
 
