@@ -116,7 +116,7 @@ async function getSearchData(portal, searchText) {
   // result.imgUrl = await googleImgSrc(page);
 
   // 브라우저 닫기
-  // browser.close();
+  browser.close();
   return result;
 }
 
@@ -178,51 +178,49 @@ async function selectKeyword(page, portal, crawlingTag) {
           // naver
         } else if (portalInfo.portal === "naver") {
           let itemList = [];
-          let name = item.className;
+          let classNameStr = item.className;
+          let classNameArr = classNameStr.split(" ");
           let title = "";
           let link = "";
           let text = "";
           let kategorie = "";
 
-          // 국어사전
-          if (name.indexOf("sp_ndic") > -1) {
-            return;
-
-            // 검색결과
-          } else if (name.indexOf("sp_ntotal") > -1) {
+          // 검색결과
+          if (classNameArr.indexOf("sp_ntotal") > -1) {
             itemList = item.querySelectorAll(".bx");
             itemList.forEach((item) => {
-              title = item.querySelector(".total_tit");
-              link = item.querySelector("a");
-              text = item.querySelector(".api_txt_lines.dsc_txt");
+              title = item.querySelector(".link_tit");
+              link = item.querySelector(".link_tit");
+              text = item.querySelector(".api_txt_lines");
               kategorie = "검색결과";
+              console.log(itemList);
               addData();
             });
 
             // 지식백과
-          } else if (name.indexOf("sp_nkindic") > -1) {
+          } else if (classNameArr.indexOf("sp_nkindic") > -1) {
             itemList = item.querySelectorAll(".nkindic_basic");
             itemList.forEach((item) => {
               title = item.querySelector("h3");
               link = item.querySelector("a");
-              text = item.querySelector(".api_txt_lines.dsc_txt");
+              text = item.querySelector(".api_txt_lines");
               kategorie = "지식백과";
               addData();
             });
 
             // view
-          } else if (name.indexOf("sp_nreview") > -1) {
+          } else if (classNameArr.indexOf("sp_nreview") > -1) {
             itemList = item.querySelectorAll(".bx");
             itemList.forEach((item) => {
-              title = item.querySelector(".api_txt_lines");
-              link = item.querySelector(".api_txt_lines");
-              text = item.querySelector(".api_txt_lines.dsc_txt");
+              title = item.querySelector(".h3");
+              link = item.querySelector("a");
+              text = item.querySelector(".api_txt_lines");
               kategorie = "view";
               addData();
             });
 
             // 뉴스
-          } else if (name.indexOf("sp_nnews") > -1) {
+          } else if (classNameArr.indexOf("sp_nnews") > -1) {
             itemList = item.querySelectorAll(".bx");
             itemList.forEach((item) => {
               title = item.querySelector(".news_tit");
@@ -231,16 +229,28 @@ async function selectKeyword(page, portal, crawlingTag) {
               kategorie = "뉴스";
               addData();
             });
+
+            // 지식인
+          } else if (classNameArr.indexOf("sp_nkin") > -1) {
+            itemList = item.querySelectorAll(".bx");
+            itemList.forEach((item) => {
+              title = item.querySelector(".question_text");
+              link = item.querySelector(".question_text");
+              text = item.querySelector(".answer_area ");
+              kategorie = "지식인";
+              addData();
+            });
           }
 
           function addData() {
-            if (title && link && text) {
+            if (title && link && text && kategorie) {
               contentsList.push({
                 title: title.textContent, // 타이틀
                 link: link.href, // 링크
                 text: text.textContent, // 내용
                 kategorie: kategorie, // 카테고리
               });
+              console.log(contentsList);
             }
           }
         }
