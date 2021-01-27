@@ -13,7 +13,7 @@ function App() {
     // },
   ]);
   const [portalList, setPortalList] = useState<any>([
-    { google: true },
+    { google: false },
     { naver: true },
   ]);
 
@@ -104,7 +104,7 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ height: window.innerHeight }}>
+    <div className="App">
       <Loading isOnLoading={isOnLoading} />
       <SearchForm getSearchData={getSearchData} />
       <SelectForm portalList={portalList} setIsOnPortal={setIsOnPortal} />

@@ -161,9 +161,9 @@ async function selectKeyword(page, portal, crawlingTag) {
         if (portalInfo.portal === "google") {
           if (item.className === "g") {
             const title = item.querySelector("h3");
-            const link = item.getElementsByClassName("yuRUbf")[0];
-            const text = item.getElementsByClassName("aCOpRe")[0];
-            const kategorie = item.getElementsByClassName("iUh30 ")[0];
+            const link = item.querySelector(".yuRUbf");
+            const text = item.querySelector(".aCOpRe");
+            const kategorie = item.querySelector(".iUh30 ");
 
             if (title && link && text && kategorie) {
               contentsList.push({
@@ -212,9 +212,9 @@ async function selectKeyword(page, portal, crawlingTag) {
           } else if (classNameArr.indexOf("sp_nreview") > -1) {
             itemList = item.querySelectorAll(".bx");
             itemList.forEach((item) => {
-              title = item.querySelector(".h3");
+              title = item.querySelector(".api_txt_lines.total_tit");
               link = item.querySelector("a");
-              text = item.querySelector(".api_txt_lines");
+              text = item.querySelector(".total_dsc");
               kategorie = "view";
               addData();
             });

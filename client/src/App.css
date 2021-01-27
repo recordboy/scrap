@@ -1,3 +1,14 @@
+html, body {
+  height: 100%;
+  background-color: #f7f7f7;
+}
+
+#root {
+  height: 100%;
+}
+
 .App {
   padding: 10px;
+  box-sizing: border-box;
+  height: 100%;
 }
