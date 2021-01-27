@@ -165,7 +165,7 @@ async function selectKeyword(page, portal, crawlingTag) {
             const text = item.getElementsByClassName("aCOpRe")[0];
             const kategorie = item.getElementsByClassName("iUh30 ")[0];
 
-            if (title && link && text) {
+            if (title && link && text && kategorie) {
               contentsList.push({
                 title: title.textContent, // 타이틀
                 link: link.children[0].href, // 링크
