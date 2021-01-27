@@ -89,23 +89,43 @@ async function getSearchData(portal, searchText) {
   //   return imgBtns.length;
   // });
 
-  const isOnNextPage = await page.evaluate(() => {
-    const nextBtn = document.querySelector("#pnnext");
+  // 해당 콘텐츠가 로드될 때까지 대기
+  if (portal === "google") {
+    await page.waitForSelector("#pnnext", { timeout: 10000 });
+  } else if (portal === "naver") {
+    await page.waitForSelector(".api_sc_page_wrap .btn_next", { timeout: 10000 });
+  }
+
+  const isOnNextPage = await page.evaluate((portal) => {
+    let nextBtn = null;
+    if (portal === "google") {
+      nextBtn = document.querySelector("#pnnext");
+    } else if (portal === "naver") {
+      nextBtn = document.querySelector(".api_sc_page_wrap .btn_next");
+    }
     if (nextBtn) {
       return true;
     }
-  });
+  }, portal);
+
 
   // 최대 25번 다음페이지 출력
   if (isOnNextPage) {
     for (let i = 0; i < 25; i++) {
       console.log(i);
-      await page.evaluate(() => {
-        const nextBtn = document.querySelector("#pnnext");
-        if (nextBtn) {
-          document.querySelector("#pnnext").click();
+      await page.evaluate((portal) => {
+        let nextBtn = null;
+        
+        if (portal === "google") {
+          nextBtn = document.querySelector("#pnnext");
+        } else if (portal === "naver") {
+          nextBtn = document.querySelector(".api_sc_page_wrap .btn_next");
         }
-      });
+        // 다음 버튼이 있는 경우에만 다음페이지 이동
+        if (nextBtn) {
+          nextBtn.click();
+        }
+      }, portal);
 
       // 검색 메인화면 콘텐츠 리스트 추가 생성
       result.mainCnt.push(...(await selectKeyword(page, portal, crawlingTag)));

@@ -13,7 +13,7 @@ function App() {
     // },
   ]);
   const [portalList, setPortalList] = useState<any>([
-    { google: false },
+    { google: true },
     { naver: true },
   ]);
 
