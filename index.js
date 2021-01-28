@@ -89,11 +89,15 @@ async function getSearchData(portal, searchText) {
   //   return imgBtns.length;
   // });
 
-  // 해당 콘텐츠가 로드될 때까지 대기
-  if (portal === "google") {
-    await page.waitForSelector("#pnnext", { timeout: 10000 });
-  } else if (portal === "naver") {
-    await page.waitForSelector(".api_sc_page_wrap .btn_next", { timeout: 10000 });
+  try {
+    // 해당 버튼이 로드될 때까지 대기
+    if (portal === "google") {
+      await page.waitForSelector("#pnnext", { timeout: 10000 });
+    } else if (portal === "naver") {
+      await page.waitForSelector(".api_sc_page_wrap .btn_next", { timeout: 10000 });
+    }
+  } catch (error) {
+    console.log('에러 발생: ' + error);
   }
 
   const isOnNextPage = await page.evaluate((portal) => {
@@ -108,14 +112,12 @@ async function getSearchData(portal, searchText) {
     }
   }, portal);
 
-
   // 최대 25번 다음페이지 출력
   if (isOnNextPage) {
-    for (let i = 0; i < 25; i++) {
-      console.log(i);
+    for (let i = 0; i < 50; i++) {
+      console.log(portal + " " + i + " 페이지");
       await page.evaluate((portal) => {
         let nextBtn = null;
-        
         if (portal === "google") {
           nextBtn = document.querySelector("#pnnext");
         } else if (portal === "naver") {

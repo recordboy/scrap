@@ -39,6 +39,7 @@ function App() {
    * @param {String} data 검색 키워드
    */
   const getSearchData = (data: string) => {
+
     // 각 포털 검색 데이터 리스트
     let dataList: any = [];
 
@@ -58,6 +59,7 @@ function App() {
 
     // 포탈 리스트 갯수만큼 검색
     const interval = setInterval(() => {
+      
       // 호출 카운트 시작
       count++;
 
