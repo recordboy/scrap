@@ -10,9 +10,11 @@ const Search = (props: {
 }) => {
   const { getSearchData, portalList, setIsOnPortal } = props;
   return (
-    <div>
-      <SelectForm portalList={portalList} setIsOnPortal={setIsOnPortal} />
-      <SearchForm getSearchData={getSearchData} />
+    <div className="search">
+      <div className="inner">
+        <SelectForm portalList={portalList} setIsOnPortal={setIsOnPortal} />
+        <SearchForm getSearchData={getSearchData} />
+      </div>
     </div>
   );
 };

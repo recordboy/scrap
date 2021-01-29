@@ -10,8 +10,18 @@ const SelectForm = (props: {
 
   return (
     <div className="form-select">
-      <InputCheckbox id="google" isOnCheck={portalList[0].google} setIsOnPortal={setIsOnPortal} />
-      <InputCheckbox id="naver" isOnCheck={portalList[1].naver} setIsOnPortal={setIsOnPortal} />
+      <div className="inner">
+        <InputCheckbox
+          id="google"
+          isOnCheck={portalList[0].google}
+          setIsOnPortal={setIsOnPortal}
+        />
+        <InputCheckbox
+          id="naver"
+          isOnCheck={portalList[1].naver}
+          setIsOnPortal={setIsOnPortal}
+        />
+      </div>
     </div>
   );
 };

@@ -1,3 +1,16 @@
 .form-select {
-    margin-top: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    .inner {
+        overflow-y: auto;
+        height: 40px;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
 }

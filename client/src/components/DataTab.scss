@@ -1,16 +1,22 @@
 .tab {
-    margin-top: 20px;
+    padding-top: 60px;
+    background-color: #333;
     .btn {
         button {
             display: block;
             float: left;
             border: none;
-            padding: 10px 20px;
-            background-color: #f7f7f7;
+            width: 70px;
+            height: 40px;
+            padding: 0;
+            font-size: 15px;
+            background-color: #ccc;
             outline: none;
             cursor: pointer;
+            color: #999;
             &.on {
-                background-color: #fff;
+                background-color: #f7f7f7;
+                color: #333;
             }
         }
         &::after {
@@ -20,6 +26,8 @@
         }
     }
     .contents {
+        background-color: #f7f7f7;
+        padding: 10px;
         &>div {
             display: none;
             &.on {
@@ -29,3 +37,4 @@
     }
 
 }
+
