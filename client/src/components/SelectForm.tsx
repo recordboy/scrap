@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import InputCheckbox from "./InputCheckbox";
 import "./SelectForm.scss";
 
@@ -7,10 +7,18 @@ const SelectForm = (props: {
   setIsOnPortal: (id: string, isOn: boolean) => void;
 }) => {
   const { portalList, setIsOnPortal } = props;
+  const [isOnOption, setIsOnOption] = useState(false);
 
   return (
     <div className="form-select">
-      <div className="inner">
+      <button type="button" className="btn" onClick={() => {
+        if (!isOnOption) {
+          setIsOnOption(true);
+        } else {
+          setIsOnOption(false);
+        }
+      }} >option</button>
+      <div className={isOnOption ? "inner on" : "inner"}>
         <InputCheckbox
           id="google"
           isOnCheck={portalList[0].google}

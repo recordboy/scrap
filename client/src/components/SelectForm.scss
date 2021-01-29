@@ -2,15 +2,26 @@
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 10;
+
+    .btn {
+        border: none;
+        width: 70px;
+        height: 40px;
+        font-size: 15px;
+        outline: none;
+        cursor: pointer;
+        background-color: teal;
+        color: #fff;
+    }
 
     .inner {
-        overflow-y: auto;
-        height: 40px;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-        
-        &::-webkit-scrollbar {
-            display: none;
+        overflow: hidden;
+        height: 0;
+        transition: height 0.2s;
+        box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+        &.on {
+            height: 80px;
         }
     }
 }

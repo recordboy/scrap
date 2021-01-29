@@ -120,6 +120,7 @@ function App() {
         getSearchData={getSearchData}
         portalList={portalList}
         setIsOnPortal={setIsOnPortal}
+        isOnLoading={isOnLoading}
       />
       <DataTab searchData={searchData} />
     </div>

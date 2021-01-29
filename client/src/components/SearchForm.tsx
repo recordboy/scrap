@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import "./SearchForm.scss";
 
-const SearchForm = (props: { getSearchData: (data: string) => void }) => {
-  const { getSearchData } = props;
+const SearchForm = (props: {
+  getSearchData: (data: string) => void;
+  isOnLoading: boolean;
+}) => {
+  const { getSearchData, isOnLoading } = props;
   const [searchText, setSearchText] = useState("");
 
   return (
     <div className="form-search">
       <input
         type="text"
+        disabled={isOnLoading ? true : false}
         onChange={(e) => {
           setSearchText(e.target.value);
         }}
@@ -24,6 +28,7 @@ const SearchForm = (props: { getSearchData: (data: string) => void }) => {
       />
       <button
         type="button"
+        disabled={isOnLoading ? true : false}
         onClick={() => {
           if (!searchText) {
             alert("검색어를 입력해주세요");
