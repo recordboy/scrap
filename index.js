@@ -90,14 +90,15 @@ async function getSearchData(portal, searchText) {
   // });
 
   try {
-    // 해당 버튼이 로드될 때까지 대기
+    // 더 보기 해당 버튼이 로드될 때까지 대기
     if (portal === "google") {
       await page.waitForSelector("#pnnext", { timeout: 10000 });
     } else if (portal === "naver") {
       await page.waitForSelector(".api_sc_page_wrap .btn_next", { timeout: 10000 });
     }
   } catch (error) {
-    console.log('에러 발생: ' + error);
+    console.log('다음 버튼 에러 발생: ' + error);
+    return result;
   }
 
   const isOnNextPage = await page.evaluate((portal) => {
@@ -229,7 +230,7 @@ async function selectKeyword(page, portal, crawlingTag) {
               kategorie = "지식백과";
               addData();
             });
-
+            
             // view
           } else if (classNameArr.indexOf("sp_nreview") > -1) {
             itemList = item.querySelectorAll(".bx");
@@ -287,7 +288,7 @@ async function selectKeyword(page, portal, crawlingTag) {
     return result;
   } catch (error) {
     // 에러 발생 시 에러 객체 반환
-    console.log("에러 발생: " + error);
+    console.log("검색 결과 에러 발생: " + error);
     return error;
   }
 }

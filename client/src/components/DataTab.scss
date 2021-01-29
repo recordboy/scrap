@@ -1,0 +1,31 @@
+.tab {
+    margin-top: 20px;
+    .btn {
+        button {
+            display: block;
+            float: left;
+            border: none;
+            padding: 10px 20px;
+            background-color: #f7f7f7;
+            outline: none;
+            cursor: pointer;
+            &.on {
+                background-color: #fff;
+            }
+        }
+        &::after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+    }
+    .contents {
+        &>div {
+            display: none;
+            &.on {
+                display: block;
+            }
+        }
+    }
+
+}

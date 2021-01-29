@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import SearchForm from "./components/SearchForm";
-import SelectForm from "./components/SelectForm";
-import PortalArea from "./components/PortalArea";
+import Search from "./components/Search";
+import DataTab from "./components/DataTab";
 import Loading from "./components/Loading";
 import "./App.css";
 
@@ -39,7 +38,6 @@ function App() {
    * @param {String} data 검색 키워드
    */
   const getSearchData = (data: string) => {
-
     // 각 포털 검색 데이터 리스트
     let dataList: any = [];
 
@@ -59,7 +57,6 @@ function App() {
 
     // 포탈 리스트 갯수만큼 검색
     const interval = setInterval(() => {
-      
       // 호출 카운트 시작
       count++;
 
@@ -77,7 +74,7 @@ function App() {
 
       // 호출 횟수 증가
       callIdx++;
-      
+
       console.log(portalName + "검색 문구: ", data);
 
       // 로딩 화면 노출
@@ -93,8 +90,19 @@ function App() {
 
           // 데이터 덩어리 갯 수와 호출 횟수가 같을 시 데이터 세팅
           if (dataList.length === callIdx) {
+            let result: any = [];
+
+            // 포탈 리스트 순서에 맞게 데이터 다시 세팅
+            dataList.forEach((item: any, idx: number) => {
+              if (item.name === "google") {
+                result[0] = item;
+              } else if (item.name === "naver") {
+                result[1] = item;
+              }
+            });
+
             // 데이터 세팅
-            setSearchData(dataList);
+            setSearchData(result);
 
             // 로딩바 제거
             setIsOnLoading(false);
@@ -108,13 +116,12 @@ function App() {
   return (
     <div className="App">
       <Loading isOnLoading={isOnLoading} />
-      <SearchForm getSearchData={getSearchData} />
-      <SelectForm portalList={portalList} setIsOnPortal={setIsOnPortal} />
-      {searchData.map((item: any, idx: number) => {
-        return (
-          <PortalArea key={idx} portalName={item.name} searchData={item} />
-        );
-      })}
+      <Search
+        getSearchData={getSearchData}
+        portalList={portalList}
+        setIsOnPortal={setIsOnPortal}
+      />
+      <DataTab searchData={searchData} />
     </div>
   );
 }

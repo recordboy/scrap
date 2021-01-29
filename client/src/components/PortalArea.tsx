@@ -9,7 +9,7 @@ const PortalArea = (props: {
   const { portalName, searchData } = props;
 
   return (
-    <div>
+    <div className="portal-area">
       <h2>{portalName}</h2>
       <SearchList searchData={searchData} />
     </div>
