@@ -94,11 +94,7 @@ async function getSearchData(portal, searchText) {
 
   try {
     // 더 보기 해당 버튼이 로드될 때까지 대기
-    if (portal === "google") {nextBtn
-      await page.waitForSelector(crawlingTag[portal].nextBtn, { timeout: 10000 });
-    } else if (portal === "naver") {
-      await page.waitForSelector(crawlingTag[portal].nextBtn, { timeout: 10000 });
-    }
+    await page.waitForSelector(crawlingTag[portal].nextBtn, { timeout: 10000 });
   } catch (error) {
     console.log('더보기 버튼 없음: ' + error);
     return result;
