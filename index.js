@@ -39,10 +39,12 @@ const crawlingTag = {
   google: {
     search: "input[class='gLFyf gsfi']",
     contents: "#rso div.g",
+    nextBtn: "#pnnext"
   },
   naver: {
     search: "#query",
     contents: "#main_pack > section.sc_new",
+    nextBtn: ".api_sc_page_wrap .btn_next"
   },
 };
 
@@ -80,6 +82,7 @@ async function getSearchData(portal, searchText) {
   // 검색 시작
   await page.type(crawlingTag[portal].search, String.fromCharCode(13));
 
+  // 첫 검색 결과 가져오기
   result.mainCnt = await selectKeyword(page, portal, crawlingTag);
 
   // let btnLength = await page.evaluate(() => {
@@ -91,16 +94,17 @@ async function getSearchData(portal, searchText) {
 
   try {
     // 더 보기 해당 버튼이 로드될 때까지 대기
-    if (portal === "google") {
-      await page.waitForSelector("#pnnext", { timeout: 10000 });
+    if (portal === "google") {nextBtn
+      await page.waitForSelector(crawlingTag[portal].nextBtn, { timeout: 10000 });
     } else if (portal === "naver") {
-      await page.waitForSelector(".api_sc_page_wrap .btn_next", { timeout: 10000 });
+      await page.waitForSelector(crawlingTag[portal].nextBtn, { timeout: 10000 });
     }
   } catch (error) {
-    console.log('다음 버튼 에러 발생: ' + error);
+    console.log('더보기 버튼 없음: ' + error);
     return result;
   }
 
+  // 다음 페이지가 있는지 체크
   const isOnNextPage = await page.evaluate((portal) => {
     let nextBtn = null;
     if (portal === "google") {
@@ -113,9 +117,9 @@ async function getSearchData(portal, searchText) {
     }
   }, portal);
 
-  // 최대 25번 다음페이지 출력
+  // 최대 35번 다음페이지 출력
   if (isOnNextPage) {
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 35; i++) {
       console.log(portal + " " + i + " 페이지");
       await page.evaluate((portal) => {
         let nextBtn = null;
@@ -172,8 +176,10 @@ async function selectKeyword(page, portal, crawlingTag) {
 
   // 예외 처리
   try {
+
     // 퍼펫티어(크로뮴) 영역
     const result = await page.evaluate((portalInfo) => {
+
       // 검색된 돔 요소를 배열에 담음
       const contents = Array.from(document.querySelectorAll(portalInfo.tag));
       let contentsList = [];
